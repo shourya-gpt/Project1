@@ -5,14 +5,19 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+/**
+ * Class for one time use. It combines a large dataset of institutions in the US with the national and subject-wise rankings of some universities into "universitiesData.csv".
+ */
 public class CombineCSV {
 
-  public static String combineCSVFiles() throws FileNotFoundException {
+  public static void combineCSVFiles() throws FileNotFoundException {
     // TODO fix for 150s
-    String[][] subjects = new String[][] {{"artsandhumanities.html", "135"},
+    String[][] subjects = new String[][] {{"national.html", "175"},{"artsandhumanities.html", "135"},
         {"businessandeconomics.html", "143"}, {"clinicalandhealth.html", "122"},
         {"computerscience.html", "124"}, {"education.html", "124"}, {"engineering.html", "141"},
         {"law.html", "65"}, {"lifesciences.html", "150"}, {"physicalsciences.html", "150"},
@@ -35,7 +40,7 @@ public class CombineCSV {
           String[] mappedArray = map.get(htmlMatcher.group(1));
           mappedArray[subNumber] = "" + count;
         } else {
-          String[] mappedArray = new String[11];
+          String[] mappedArray = new String[12];
           mappedArray[subNumber] = "" + count;
           map.put(htmlMatcher.group(1), mappedArray);
         }
@@ -111,7 +116,7 @@ public class CombineCSV {
     String text2 = scanner2.nextLine() + ",";
     int i = 0;
     for (String[] subject : subjects) {
-      if (i == 10) {
+      if (i == 11) {
         text2 += subject[0];
       } else {
         text2 += subject[0] + ",";
@@ -120,7 +125,6 @@ public class CombineCSV {
     // TODO learn
 
     Pattern uniPattern = Pattern.compile("^[^,]+(?:, [^,]+)?(?=,)");
-    int numberMatches = 0;
 
     while (scanner2.hasNextLine()) {
       String line = scanner2.nextLine();
@@ -129,11 +133,8 @@ public class CombineCSV {
       String[] rankings = map.get(uniMatcher.group(0));
 
       if (rankings != null) {
-        for (String ranking : rankings) {
-        }
-        numberMatches++;
         text2 += "\n" + line + ",";
-        for (int j = 0; j < 11; j++) {
+        for (int j = 0; j < 12; j++) {
           if (rankings[j] == null) {
             rankings[j] = "";
           }
@@ -141,7 +142,7 @@ public class CombineCSV {
         }
 
       } else {
-        text2 += "\n" + line + ",,,,,,,,,,";
+        text2 += "\n" + line + ",,,,,,,,,,,";
       }
 
 
@@ -149,7 +150,23 @@ public class CombineCSV {
     }
 
     scanner2.close();
-    return text2;
+    
+    //File textFile = new File("universitiesData.txt");
+    
+    FileWriter writer;
+    
+    try {
+      //textFile.createNewFile();
+      writer = new FileWriter("universitiesData.csv");
+      System.out.println(text2);
+      writer.write(text2);
+      
+    }
+    catch(IOException e){
+      e.printStackTrace();
+    }
+    
+    
   }
 
 
